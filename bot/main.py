@@ -5,5 +5,7 @@ from discord.ext import commands
 
 load_dotenv()
 
-dndBot = commands.Bot(command_prefix=".")
+discordIntents = discord.Intents.default()
+
+dndBot = commands.Bot(command_prefix=".", intents = discordIntents)
 dndBot.run(os.getenv('BOT_TOKEN'))
