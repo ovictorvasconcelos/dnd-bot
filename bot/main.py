@@ -1,11 +1,12 @@
 import os
-import discord
 from dotenv import load_dotenv
-from discord.ext import commands
+from bot.bot_config import dndBot
 
 load_dotenv()
 
-discordIntents = discord.Intents.default()
+def loadBotEvents():
+    import bot.events.on_ready
 
-dndBot = commands.Bot(command_prefix=".", intents = discordIntents)
+loadBotEvents()
+
 dndBot.run(os.getenv('BOT_TOKEN'))
