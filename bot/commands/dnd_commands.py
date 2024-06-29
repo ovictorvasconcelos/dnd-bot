@@ -110,10 +110,11 @@ async def dnd_class(interact: discord.Interaction, class_name: str):
         embedConfig.add_field(name="Subclasses", value=classSubclasses, inline=False)
 
         await interact.response.send_message(embed=embedConfig)
-        
-@dndBot.command(name="create_character", help="Creates a sheet for a character")
-async def create_character(context: commands.Context, name: str, dnd_class: str, race: str):
-    userId = context.author.id
+
+@dndBot.tree.command(description="Create a character to start the game")
+@app_commands.describe(name="Your name", class_name="Your classe", race="Your race")
+async def create_character(interact: discord.Interaction, name: str, class_name: str, race: str):
+    userId = interact.user.id
 
     userAttributes = {
         'Strengh': roll_4d6(),
@@ -121,14 +122,24 @@ async def create_character(context: commands.Context, name: str, dnd_class: str,
         'Constitution': roll_4d6(),
         'Intelligence': roll_4d6(),
         'Wisdom': roll_4d6(),
-        'Charisma': roll_4d6
+        'Charisma': roll_4d6()
     }
-
-    create_character[userId] = {
+    
+    character_sheets[userId] = {
         'name': name,
-        'class': dnd_class,
+        'class': class_name,
         'level': 1,
         'attributes': userAttributes
     }
 
-    await context.reply(f"Character {name} the {race} {dnd_class} created successfully with attributes: {userAttributes}")
+    embedConfig = discord.Embed(color=1, title=f'D&D 5e Character - **Successfully Created!**', description=f"")
+    embedConfig.set_thumbnail(url=f"{interact.user.avatar}")
+
+    embedConfig.add_field(name="Player name", value=name.capitalize(), inline=False)
+    embedConfig.add_field(name="Player Race", value=race.capitalize(), inline=False)
+    embedConfig.add_field(name="Player class", value=class_name.capitalize(), inline=False)
+
+    for attribute, value, in userAttributes.items():
+         embedConfig.add_field(name=attribute, value=value, inline=True)
+
+    await interact.response.send_message(embed=embedConfig) 
