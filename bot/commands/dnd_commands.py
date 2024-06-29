@@ -32,10 +32,13 @@ async def show_races(interact: discord.Interaction):
 
         for race in range(len(raceData['results'])):
             allRaces.append(raceData['results'][race]['name'])
-            
+        
         raceString = '\n'.join(allRaces)
 
-        await interact.response.send_message(f'**D&D 5e - All Races**\n\n{raceString}')
+        embedConfig = discord.Embed(color=1, title='D&D 5e - All Races', description=f"{raceString}")
+        embedConfig.set_thumbnail(url="https://th.bing.com/th/id/OIG3.V8mtCM5vXGahqc_9NnnH?w=270&h=270&c=6&r=0&o=5&dpr=1.3&pid=ImgGn")
+
+        await interact.response.send_message(embed=embedConfig)
 
 @dndBot.tree.command(description="List all the classes availabe available in D&D 5e")
 async def show_classes(interact: discord.Interaction):
@@ -53,7 +56,10 @@ async def show_classes(interact: discord.Interaction):
             
         classString = '\n'.join(allClasses)
 
-        await interact.response.send_message(f'**D&D 5e - All Classes**\n\n{classString}')
+        embedConfig = discord.Embed(color=1, title='D&D 5e - All Classes', description=f"{classString}")
+        embedConfig.set_thumbnail(url="https://th.bing.com/th/id/OIG3.V8mtCM5vXGahqc_9NnnH?w=270&h=270&c=6&r=0&o=5&dpr=1.3&pid=ImgGn")
+
+        await interact.response.send_message(embed=embedConfig)
 
 @dndBot.tree.command(description="List the information for a specific class")
 @app_commands.describe(class_name="The name of the chosen class")
@@ -64,7 +70,11 @@ async def dnd_class(interact: discord.Interaction, class_name: str):
     if response.status_code == 200:
         classData = json.loads(response.content)
 
-        await interact.response.send_message(f'Class - **\n\n{classData['name']}**')
+        embedConfig = discord.Embed(color=1, title=f'Class - **{classData['name']}**', description=f"")
+        embedConfig.set_thumbnail(url="https://th.bing.com/th/id/OIG3.V8mtCM5vXGahqc_9NnnH?w=270&h=270&c=6&r=0&o=5&dpr=1.3&pid=ImgGn")
+
+        await interact.response.send_message(embed=embedConfig)
+        
 
 """
 @dndBot.command(name='class', aliases=['classe'], help='Show information about a class')
