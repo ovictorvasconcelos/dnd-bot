@@ -37,8 +37,36 @@ async def show_races(interact: discord.Interaction):
 
         await interact.response.send_message(f'**D&D 5e - All Races**\n\n{raceString}')
 
+@dndBot.tree.command(description="List all the classes availabe available in D&D 5e")
+async def show_classes(interact: discord.Interaction):
+    classUrl = f"{os.getenv('API_URL')}"
 
+    allClasses = []
 
+    response = requests.get(f"{classUrl}/classes")
+
+    if response.status_code == 200:
+        classData = json.loads(response.content)
+
+        for dnd_class in range(len(classData['results'])):
+            allClasses.append(classData['results'][dnd_class]['name'])
+            
+        classString = '\n'.join(allClasses)
+
+        await interact.response.send_message(f'**D&D 5e - All Classes**\n\n{classString}')
+
+@dndBot.tree.command(description="List the information for a specific class")
+@app_commands.describe(class_name="The name of the chosen class")
+async def dnd_class(interact: discord.Interaction, class_name: str):
+    classUrl = f"{os.getenv('API_URL')}/classes/{class_name.lower()}"
+    response = requests.get(classUrl)
+
+    if response.status_code == 200:
+        classData = json.loads(response.content)
+
+        await interact.response.send_message(f'Class - **\n\n{classData['name']}**')
+
+"""
 @dndBot.command(name='class', aliases=['classe'], help='Show information about a class')
 async def dnd_class(context: commands.Context, *, class_name):
     classUrl = f"{os.getenv('API_URL')}/classes/{class_name.lower()}"
@@ -57,7 +85,7 @@ async def dnd_class(context: commands.Context, *, class_name):
     else:
         await context.send(f'Could not find information about the class "{class_name}".')
     
-
+"""
 
 @dndBot.command(name="create_character", help="Creates a sheet for a character")
 async def create_character(context: commands.Context, name: str, dnd_class: str, race: str):
