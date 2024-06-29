@@ -1,8 +1,10 @@
 import os
 import json
 import random
+import discord
 import requests
 from dotenv import load_dotenv
+from discord import app_commands
 from discord.ext import commands
 from bot.bot_config import dndBot
 
@@ -17,8 +19,8 @@ def roll_4d6():
     return sum(rolls)
 
 #BOT COMMANDS
-@dndBot.command(name='show_races', help='Show all races in D&D 5e')
-async def show_races(context: commands.Context, *, race_name):
+@dndBot.tree.command(description="List all the races available in D&D 5e")
+async def show_races(interact: discord.Interaction):
     raceUrl = f"{os.getenv('API_URL')}"
 
     allRaces = []
@@ -33,7 +35,8 @@ async def show_races(context: commands.Context, *, race_name):
             
         raceString = '\n'.join(allRaces)
 
-        await context.reply(f'**D&D 5e - All Races**\n\n{raceString}')
+        await interact.response.send_message(f'**D&D 5e - All Races**\n\n{raceString}')
+
 
 
 @dndBot.command(name='class', aliases=['classe'], help='Show information about a class')
