@@ -24,9 +24,14 @@ async def dnd_class(context: commands.Context, *, class_name):
 
     if response.status_code == 200:
         classData = json.loads(response.content)
+
+        classStartEquipament = []
         classDescription = classData['proficiency_choices'][0]['desc']
 
-        await context.reply(f'Class - **{classData['name']}**\n\n{classDescription}')
+        for item in range(len(classData['starting_equipment'])):
+            classStartEquipament.append(classData['starting_equipment'][item]['equipment']['name'])
+
+        await context.reply(f'Class - **{classData['name']}**\n\nStart Equipament: {classStartEquipament}')
     else:
         await context.send(f'Could not find information about the class "{class_name}".')
     
