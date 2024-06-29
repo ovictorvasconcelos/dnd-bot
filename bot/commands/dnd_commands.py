@@ -65,38 +65,52 @@ async def show_classes(interact: discord.Interaction):
 @app_commands.describe(class_name="The name of the chosen class")
 async def dnd_class(interact: discord.Interaction, class_name: str):
     classUrl = f"{os.getenv('API_URL')}/classes/{class_name.lower()}"
-    response = requests.get(classUrl)
+    responseClass = requests.get(classUrl)
 
-    if response.status_code == 200:
-        classData = json.loads(response.content)
+    if responseClass.status_code == 200:
+        classData = json.loads(responseClass.content)
 
-        embedConfig = discord.Embed(color=1, title=f'Class - **{classData['name']}**', description=f"")
-        embedConfig.set_thumbnail(url="https://th.bing.com/th/id/OIG3.V8mtCM5vXGahqc_9NnnH?w=270&h=270&c=6&r=0&o=5&dpr=1.3&pid=ImgGn")
-
-        await interact.response.send_message(embed=embedConfig)
-        
-
-"""
-@dndBot.command(name='class', aliases=['classe'], help='Show information about a class')
-async def dnd_class(context: commands.Context, *, class_name):
-    classUrl = f"{os.getenv('API_URL')}/classes/{class_name.lower()}"
-    response = requests.get(classUrl)
-
-    if response.status_code == 200:
-        classData = json.loads(response.content)
-
+        classSubclasses = []
+        classSavingThrows = []
+        classProficiencies = []
         classStartEquipament = []
-        classDescription = classData['proficiency_choices'][0]['desc']
+        classSavingThrowsName = []
+
+        className = classData['name']
+        classHitDie = classData['hit_die']
+        classProficiencyChoices = classData['proficiency_choices'][0]['desc']
+
+        for item in range(len(classData['saving_throws'])):
+            classSavingThrows.append(classData['saving_throws'][item]['name'])
 
         for item in range(len(classData['starting_equipment'])):
             classStartEquipament.append(classData['starting_equipment'][item]['equipment']['name'])
 
-        await context.reply(f'Class - **{classData['name']}**\n\nStart Equipament: {classStartEquipament}')
-    else:
-        await context.send(f'Could not find information about the class "{class_name}".')
-    
-"""
+        for item in range(len(classData['subclasses'])):
+            classSubclasses.append(classData['subclasses'][item]['name'])
 
+        for item in range(len(classSavingThrows)):
+            abilityScoresUrl = f"{os.getenv('API_URL')}/ability-scores/{classSavingThrows[item].lower()}"
+            responseabilityScoresUrl = requests.get(abilityScoresUrl)
+
+            abilityScoresData = json.loads(responseabilityScoresUrl.content)
+            classSavingThrowsName.append(abilityScoresData['full_name'])
+
+        for item in range(len(classData['proficiencies'])):
+            classProficiencies.append(classData['proficiencies'][item]['name'])
+
+        embedConfig = discord.Embed(color=1, title=f'Class - **{className}**', description=f"")
+        embedConfig.set_thumbnail(url="https://th.bing.com/th/id/OIG3.V8mtCM5vXGahqc_9NnnH?w=270&h=270&c=6&r=0&o=5&dpr=1.3&pid=ImgGn")
+
+        embedConfig.add_field(name="Hit Die", value=classHitDie, inline=False)
+        embedConfig.add_field(name="Saving Throws", value=classSavingThrowsName, inline=False)
+        embedConfig.add_field(name="Proficiencies", value=classProficiencies, inline=False)
+        embedConfig.add_field(name="Starting Equipment", value=classStartEquipament, inline=False)
+        embedConfig.add_field(name="Proficiency Choices", value=classProficiencyChoices, inline=False)
+        embedConfig.add_field(name="Subclasses", value=classSubclasses, inline=False)
+
+        await interact.response.send_message(embed=embedConfig)
+        
 @dndBot.command(name="create_character", help="Creates a sheet for a character")
 async def create_character(context: commands.Context, name: str, dnd_class: str, race: str):
     userId = context.author.id
