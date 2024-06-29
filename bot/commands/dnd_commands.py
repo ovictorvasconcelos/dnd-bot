@@ -126,8 +126,9 @@ async def create_character(interact: discord.Interaction, name: str, class_name:
     }
     
     character_sheets[userId] = {
-        'name': name,
-        'class': class_name,
+        'name': name.capitalize(),
+        'race': race.capitalize(),
+        'class': class_name.capitalize(),
         'level': 1,
         'attributes': userAttributes
     }
@@ -136,10 +137,34 @@ async def create_character(interact: discord.Interaction, name: str, class_name:
     embedConfig.set_thumbnail(url=f"{interact.user.avatar}")
 
     embedConfig.add_field(name="Player name", value=name.capitalize(), inline=False)
+    embedConfig.add_field(name="Player level", value=character_sheets[userId]['level'], inline=False)
     embedConfig.add_field(name="Player Race", value=race.capitalize(), inline=False)
     embedConfig.add_field(name="Player class", value=class_name.capitalize(), inline=False)
 
     for attribute, value, in userAttributes.items():
          embedConfig.add_field(name=attribute, value=value, inline=True)
 
-    await interact.response.send_message(embed=embedConfig) 
+    await interact.response.send_message(embed=embedConfig)
+
+@dndBot.tree.command(description="See your character sheet")
+async def view_character(interact: discord.Interaction):
+    userId = interact.user.id
+
+    if userId in character_sheets:
+        characterProfile = character_sheets[userId]
+        userAttributes = characterProfile['attributes']
+
+        embedConfig = discord.Embed(color=discord.Color.blue(), title=f'D&D 5e Character - **{characterProfile["name"]}**')
+        embedConfig.set_thumbnail(url=interact.user.avatar.url)
+
+        embedConfig.add_field(name="Player name", value=characterProfile['name'], inline=False)
+        embedConfig.add_field(name="Player level", value=characterProfile['level'], inline=False)
+        embedConfig.add_field(name="Player Race", value=characterProfile['race'], inline=False)
+        embedConfig.add_field(name="Player class", value=characterProfile['class'], inline=False)
+
+        for attribute, value, in userAttributes.items():
+            embedConfig.add_field(name=attribute, value=value, inline=True)
+
+        await interact.response.send_message(embed=embedConfig)
+    else:
+        await interact.response.send_message("You don't have a character sheet yet. Use `/create_character` to create one.")
