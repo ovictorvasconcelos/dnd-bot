@@ -17,6 +17,25 @@ def roll_4d6():
     return sum(rolls)
 
 #BOT COMMANDS
+@dndBot.command(name='show_races', help='Show all races in D&D 5e')
+async def show_races(context: commands.Context, *, race_name):
+    raceUrl = f"{os.getenv('API_URL')}"
+
+    allRaces = []
+
+    response = requests.get(f"{raceUrl}/races")
+
+    if response.status_code == 200:
+        raceData = json.loads(response.content)
+
+        for race in range(len(raceData['results'])):
+            allRaces.append(raceData['results'][race]['name'])
+            
+        raceString = '\n'.join(allRaces)
+
+        await context.reply(f'**D&D 5e - All Races**\n\n{raceString}')
+
+
 @dndBot.command(name='class', aliases=['classe'], help='Show information about a class')
 async def dnd_class(context: commands.Context, *, class_name):
     classUrl = f"{os.getenv('API_URL')}/classes/{class_name.lower()}"
