@@ -98,7 +98,8 @@ async def create_character(interact: discord.Interaction, name: str, class_name:
         'race': race.capitalize(),
         'class': class_name.capitalize(),
         'level': 1,
-        'attributes': user_attributes
+        'attributes': user_attributes,
+        'hp': roll_4d6() + user_attributes['Constitution']
     }
 
     embed = create_embed(f'D&D 5e Character - **Successfully Created!**', "", interact.user.avatar.url)
@@ -110,6 +111,8 @@ async def create_character(interact: discord.Interaction, name: str, class_name:
 
     for attribute, value in user_attributes.items():
         embed.add_field(name=attribute, value=value, inline=True)
+    
+    embed.add_field(name='Health Points', value=character_sheets[user_id]['hp'], inline= False)
 
     await interact.response.send_message(embed=embed)
 
@@ -128,9 +131,10 @@ async def view_character(interact: discord.Interaction):
         embed.add_field(name="Player Race", value=character_profile['race'], inline=False)
         embed.add_field(name="Player class", value=character_profile['class'], inline=False)
 
-
         for attribute, value in user_attributes.items():
             embed.add_field(name=attribute, value=value, inline=True)
+        
+        embed.add_field(name='Health Points', value=character_profile['hp'], inline=False)
 
         await interact.response.send_message(embed=embed)
     else:
