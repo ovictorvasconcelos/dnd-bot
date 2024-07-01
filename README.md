@@ -12,10 +12,13 @@ i.e. it allows them to play D&D within the Discord application without too many 
 
 ## Features
 
-- Text
-- Text
-- Text
-- Text
+- See all classes from D&D 5e
+- See races classes from D&D 5e
+- See information about one race from D&D 5e
+- See information about one class from D&D 5e
+
+- View a character sheet
+- Create a character sheet
 
 ## Contributing
 
